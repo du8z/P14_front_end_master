@@ -1,11 +1,13 @@
 import "./CreateEmployee.css";
-import { ReactDOM } from "react";
-import React, { Component, useState } from "react";
+import React, { useState, useEffect } from "react";
 import StateDropdown from "../../components/StateDropdown/StateDropdown";
 
 
 export default function Home() {
-  const [employee, setEmployeeData] = useState([]);
+  const [employee, setEmployeeData] = useState(() => {
+    const savedData = localStorage.getItem("employees");
+    return savedData ? JSON.parse(savedData) : [];
+  });
   const [firstName, setfirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
@@ -17,7 +19,6 @@ export default function Home() {
   const [departement, setDepartement] = useState("");
 
   const handleSubmit = (e) => {
-    console.log('oui');
     e.preventDefault();
     const newEmployee = {
       firstName: firstName,
@@ -30,9 +31,32 @@ export default function Home() {
       zipCode: zipCode,
       departement: departement,
     };
+    
+    const updatedEmployeeData = [...employee, newEmployee];
+    setEmployeeData(updatedEmployeeData);
 
-    setEmployeeData([...employee, newEmployee]);
+    localStorage.setItem("employees", JSON.stringify(updatedEmployeeData));
+
+    setfirstName("");
+    setLastName("");
+    setDateOfBirth("");
+    setStartDate("");
+    setStreet("");
+    setCity("");
+    setState("");
+    setZipCode("");
+    setDepartement("");
   };
+  console.log(employee);
+
+  useEffect(() => {
+    const savedData = localStorage.getItem("employees");
+    if (savedData) {
+      setEmployeeData(JSON.parse(savedData));
+    }
+  }, [])
+
+
 
   return (
     <div className="BodyHome">
@@ -127,9 +151,10 @@ export default function Home() {
             <option value="Human Resources">Human Resources</option>
             <option value="Legal">Legal</option>
           </select>
+          <button type="submit">Save</button>
+
         </form>
 
-        <button>Save</button>
       </div>
       <div id="confirmation" className="modal">
         Employee Created!
