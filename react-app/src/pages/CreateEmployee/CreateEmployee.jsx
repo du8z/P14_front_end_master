@@ -1,6 +1,9 @@
 import "./CreateEmployee.css";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import StateDropdown from "../../components/StateDropdown/StateDropdown";
+import "react-datepicker/dist/react-datepicker.css";
+import DatePickers from "../../components/DatePicker/DatePicker";
+import { format } from "date-fns";
 
 
 export default function Home() {
@@ -8,10 +11,11 @@ export default function Home() {
     const savedData = localStorage.getItem("employees");
     return savedData ? JSON.parse(savedData) : [];
   });
+
   const [firstName, setfirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState("");
-  const [startDate, setStartDate] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState(new Date());
+  const [startDate, setStartDate] = useState(new Date());
   const [street, setStreet] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
@@ -20,21 +24,25 @@ export default function Home() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const formattedDateOfBirth = format(dateOfBirth, "dd/MM/yyyy");
+    const formattedStartDate = format(startDate, "dd/MM/yyyy");
+
     const newEmployee = {
       firstName: firstName,
       lastName: lastName,
-      dateOfBirth: dateOfBirth,
-      startDate: startDate,
+      dateOfBirth: formattedDateOfBirth,
+      startDate: formattedStartDate,
       street: street,
       city: city,
       state: state,
       zipCode: zipCode,
       departement: departement,
     };
-    
     const updatedEmployeeData = [...employee, newEmployee];
     setEmployeeData(updatedEmployeeData);
 
+    // Mettez à jour localStorage avec les nouvelles données des employés.
     localStorage.setItem("employees", JSON.stringify(updatedEmployeeData));
 
     setfirstName("");
@@ -47,16 +55,14 @@ export default function Home() {
     setZipCode("");
     setDepartement("");
   };
-  console.log(employee);
 
   useEffect(() => {
     const savedData = localStorage.getItem("employees");
     if (savedData) {
       setEmployeeData(JSON.parse(savedData));
+      console.log(employee);
     }
-  }, [])
-
-
+  }, []);
 
   return (
     <div className="BodyHome">
@@ -66,7 +72,7 @@ export default function Home() {
       <div className="container">
         <a href="employee-list">View Current Employees</a>
         <h2>Create Employee</h2>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="flexForm">
           <label htmlFor="firstname">First Name</label>
           <input
             type="text"
@@ -84,24 +90,18 @@ export default function Home() {
             onChange={(e) => setLastName(e.target.value)}
             required
           />
-
-          <label htmlFor="date-of-birth">Date of Birth</label>
-          <input
-            type="text"
-            id="dateOfBirth"
-            value={dateOfBirth}
-            onChange={(e) => setDateOfBirth(e.target.value)}
-            required
-          />
-
-          <label htmlFor="start-date">Start Date</label>
-          <input
-            type="text"
-            id="startDate"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            required
-          />
+          <DatePickers
+          label="Date of Birth"
+          selected={dateOfBirth}
+          onChange={(date) => setDateOfBirth(date)}
+          showMonthYearPicker
+        />
+        <DatePickers
+          label="Start Date"
+          selected={startDate}
+          onChange={(date) => setStartDate(date)}
+          showMonthYearPicker
+        />
 
           <fieldset className="address">
             <legend>Address</legend>
@@ -125,7 +125,10 @@ export default function Home() {
             />
 
             <label htmlFor="state">State</label>
-            <StateDropdown value={state} onChange={(e) => setState(e.target.value)} />
+            <StateDropdown
+              value={state}
+              onChange={(e) => setState(e.target.value)}
+            />
 
             <label htmlFor="zip-code">Zip Code</label>
             <input
@@ -151,10 +154,10 @@ export default function Home() {
             <option value="Human Resources">Human Resources</option>
             <option value="Legal">Legal</option>
           </select>
-          <button type="submit">Save</button>
-
+          <button type="submit" className="saveButton">
+            Save
+          </button>
         </form>
-
       </div>
       <div id="confirmation" className="modal">
         Employee Created!
