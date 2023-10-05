@@ -5,13 +5,14 @@ import "react-datepicker/dist/react-datepicker.css";
 import DatePickers from "../../components/DatePicker/DatePicker";
 import { format } from "date-fns";
 
-
 export default function Home() {
+  // Base de Données des employés
   const [employee, setEmployeeData] = useState(() => {
     const savedData = localStorage.getItem("employees");
     return savedData ? JSON.parse(savedData) : [];
   });
 
+  // Création des States des inputs
   const [firstName, setfirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState(new Date());
@@ -22,12 +23,15 @@ export default function Home() {
   const [zipCode, setZipCode] = useState("");
   const [departement, setDepartement] = useState("");
 
+  // Actions lors de l'envoi du formulaire
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    // formate les dates
     const formattedDateOfBirth = format(dateOfBirth, "dd/MM/yyyy");
     const formattedStartDate = format(startDate, "dd/MM/yyyy");
 
+    // Crée un nouvel employé avec les bonnes données
     const newEmployee = {
       firstName: firstName,
       lastName: lastName,
@@ -39,12 +43,15 @@ export default function Home() {
       zipCode: zipCode,
       departement: departement,
     };
+
+    // Ajout du nouvel employé
     const updatedEmployeeData = [...employee, newEmployee];
     setEmployeeData(updatedEmployeeData);
 
     // Mettez à jour localStorage avec les nouvelles données des employés.
     localStorage.setItem("employees", JSON.stringify(updatedEmployeeData));
 
+    // Reset les inputs
     setfirstName("");
     setLastName("");
     setDateOfBirth("");
@@ -56,6 +63,7 @@ export default function Home() {
     setDepartement("");
   };
 
+  // sauvegarder les employés
   useEffect(() => {
     const savedData = localStorage.getItem("employees");
     if (savedData) {
@@ -63,7 +71,7 @@ export default function Home() {
       console.log(employee);
     }
   }, []);
-
+  // JSX du formualaire, des différents input
   return (
     <div className="BodyHome">
       <div className="title">
@@ -90,18 +98,17 @@ export default function Home() {
             onChange={(e) => setLastName(e.target.value)}
             required
           />
+          {/* Séléction des dates  */}
           <DatePickers
-          label="Date of Birth"
-          selected={dateOfBirth}
-          onChange={(date) => setDateOfBirth(date)}
-          showMonthYearPicker
-        />
-        <DatePickers
-          label="Start Date"
-          selected={startDate}
-          onChange={(date) => setStartDate(date)}
-          showMonthYearPicker
-        />
+            label="Date of Birth"
+            selected={dateOfBirth}
+            onChange={(date) => setDateOfBirth(date)}
+          />
+          <DatePickers
+            label="Start Date"
+            selected={startDate}
+            onChange={(date) => setStartDate(date)}
+          />
 
           <fieldset className="address">
             <legend>Address</legend>
