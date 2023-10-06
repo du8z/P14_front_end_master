@@ -1,11 +1,20 @@
 import "./CreateEmployee.css";
-import React, { useState, useEffect, useReducer } from "react";
+import React, { useState, useEffect } from "react";
 import StateDropdown from "../../components/StateDropdown/StateDropdown";
 import "react-datepicker/dist/react-datepicker.css";
 import DatePickers from "../../components/DatePicker/DatePicker";
 import { format } from "date-fns";
-
+import Modal from "../../components/Modal/Modal";
 export default function Home() {
+  // État de la modal (ouverte/fermée) et fonctions pour la gérer.
+  const [showModal, setShowModal] = useState(false)
+
+  const openModal = () => {
+    setShowModal(true)
+  }
+  const closeModal = () => {
+    setShowModal(false)
+  }
   // Base de Données des employés
   const [employee, setEmployeeData] = useState(() => {
     const savedData = localStorage.getItem("employees");
@@ -61,6 +70,8 @@ export default function Home() {
     setState("");
     setZipCode("");
     setDepartement("");
+
+    openModal()
   };
 
   // sauvegarder les employés
@@ -166,9 +177,12 @@ export default function Home() {
           </button>
         </form>
       </div>
-      <div id="confirmation" className="modal">
-        Employee Created!
-      </div>
+      {/* MODAL  */}
+      <Modal
+        show={showModal}
+        onClose={closeModal}
+        message="Employee Created !"
+      />
     </div>
   );
 }
