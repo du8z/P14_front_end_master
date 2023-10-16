@@ -1,14 +1,14 @@
 import React from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import fr from "date-fns/locale/fr";
 import { getYear, getMonth } from "date-fns";
 import range from "lodash/range";
 
 export default function DatePickers({
-  label,
   selected,
   onChange,
+  id,
+  label,
 }) {
   const years = range(1950, getYear(new Date()) + 1, 1);
   const months = [
@@ -25,9 +25,11 @@ export default function DatePickers({
     "November",
     "December",
   ];
+  const datePickerId = id
   return (
     <div className="date-picker-wrapper">
-      <label>{label}</label>
+      <label htmlFor={datePickerId}>{label}</label>
+      <input type="hidden" id={datePickerId} name={datePickerId} />
       <DatePicker
         renderCustomHeader={({
           date,

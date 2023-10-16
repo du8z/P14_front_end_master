@@ -1,11 +1,17 @@
 import "./CreateEmployee.css";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import StateDropdown from "../../components/StateDropdown/StateDropdown";
 import "react-datepicker/dist/react-datepicker.css";
 import DatePickers from "../../components/DatePicker/DatePicker";
 import { format } from "date-fns";
 import Modal from "../../components/Modal/Modal";
+import { addEmployee } from "../../Redux/employeeSlice";
+import { useDispatch } from 'react-redux'
+
 export default function Home() {
+
+  const dispatch = useDispatch()
+
   // État de la modal (ouverte/fermée) et fonctions pour la gérer.
   const [showModal, setShowModal] = useState(false)
 
@@ -15,73 +21,61 @@ export default function Home() {
   const closeModal = () => {
     setShowModal(false)
   }
-  // Base de Données des employés
-  const [employee, setEmployeeData] = useState(() => {
-    const savedData = localStorage.getItem("employees");
-    return savedData ? JSON.parse(savedData) : [];
-  });
+  const [employee, setEmployee] = useState({
+    firstName: '',
+    lastName: '',
+    dateOfBirth: new Date(),
+    startDate: new Date(),
+    street: '',
+    city: '',
+    state: '',
+    zipCode: 0,
+    department: '',
 
-  // Création des States des inputs
-  const [firstName, setfirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState(new Date());
-  const [startDate, setStartDate] = useState(new Date());
-  const [street, setStreet] = useState("");
-  const [city, setCity] = useState("");
-  const [state, setState] = useState("");
-  const [zipCode, setZipCode] = useState("");
-  const [departement, setDepartement] = useState("");
+  })
 
   // Actions lors de l'envoi du formulaire
   const handleSubmit = (e) => {
     e.preventDefault();
 
     // formate les dates
-    const formattedDateOfBirth = format(dateOfBirth, "dd/MM/yyyy");
-    const formattedStartDate = format(startDate, "dd/MM/yyyy");
+    const formattedDateOfBirth = format(employee.dateOfBirth, "dd/MM/yyyy");
+    const formattedStartDate = format(employee.startDate, "dd/MM/yyyy");
 
     // Crée un nouvel employé avec les bonnes données
     const newEmployee = {
-      firstName: firstName,
-      lastName: lastName,
+      firstName: employee.firstName,
+      lastName: employee.lastName,
       dateOfBirth: formattedDateOfBirth,
       startDate: formattedStartDate,
-      street: street,
-      city: city,
-      state: state,
-      zipCode: zipCode,
-      departement: departement,
+      street: employee.street,
+      city: employee.city,
+      state: employee.state,
+      zipCode: employee.zipCode,
+      department: employee.department,
     };
+    console.log(newEmployee);
+    dispatch(addEmployee(newEmployee))
 
-    // Ajout du nouvel employé
-    const updatedEmployeeData = [...employee, newEmployee];
-    setEmployeeData(updatedEmployeeData);
-
-    // Mettez à jour localStorage avec les nouvelles données des employés.
-    localStorage.setItem("employees", JSON.stringify(updatedEmployeeData));
 
     // Reset les inputs
-    setfirstName("");
-    setLastName("");
-    setDateOfBirth("");
-    setStartDate("");
-    setStreet("");
-    setCity("");
-    setState("");
-    setZipCode("");
-    setDepartement("");
+    setEmployee({
+      firstName: '',
+      lastName: '',
+      dateOfBirth: new Date(),
+      startDate: new Date(),
+      street: '',
+      city: '',
+      state: '',
+      zipCode: '',
+      department: '', 
+    });
+
 
     openModal()
   };
 
-  // sauvegarder les employés
-  useEffect(() => {
-    const savedData = localStorage.getItem("employees");
-    if (savedData) {
-      setEmployeeData(JSON.parse(savedData));
-      console.log(employee);
-    }
-  }, []);
+
   // JSX du formualaire, des différents input
   return (
     <div className="BodyHome">
@@ -92,12 +86,12 @@ export default function Home() {
         <a href="employee-list">View Current Employees</a>
         <h2>Create Employee</h2>
         <form onSubmit={handleSubmit} className="flexForm">
-          <label htmlFor="firstname">First Name</label>
+          <label htmlFor="firstName">First Name</label>
           <input
             type="text"
             id="firstName"
-            value={firstName}
-            onChange={(e) => setfirstName(e.target.value)}
+            value={employee.firstName}
+            onChange={(e) => setEmployee({ ...employee, firstName: e.target.value })}
             required
           />
 
@@ -105,21 +99,28 @@ export default function Home() {
           <input
             type="text"
             id="lastName"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
+            value={employee.lastName}
+            onChange={(e) => setEmployee({ ...employee, lastName: e.target.value })}
             required
           />
-          {/* Séléction des dates  */}
+
+          {/* Sélection des dates */}
+          <div >
           <DatePickers
-            label="Date of Birth"
-            selected={dateOfBirth}
-            onChange={(date) => setDateOfBirth(date)}
+            label='Date of Birth'
+            id= 'dateOfBirth'
+            selected={employee.dateOfBirth}
+            onChange={(date) => setEmployee({ ...employee, dateOfBirth: date })}
           />
+          </div>
+          <div >
           <DatePickers
-            label="Start Date"
-            selected={startDate}
-            onChange={(date) => setStartDate(date)}
+            label='Start Date'
+            id= 'startDate'
+            selected={employee.startDate}
+            onChange={(date) => setEmployee({ ...employee, startDate: date })}
           />
+          </div>
 
           <fieldset className="address">
             <legend>Address</legend>
@@ -128,8 +129,8 @@ export default function Home() {
             <input
               type="text"
               id="street"
-              value={street}
-              onChange={(e) => setStreet(e.target.value)}
+              value={employee.street}
+              onChange={(e) => setEmployee({ ...employee, street: e.target.value })}
               required
             />
 
@@ -137,23 +138,23 @@ export default function Home() {
             <input
               type="text"
               id="city"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
+              value={employee.city}
+              onChange={(e) => setEmployee({ ...employee, city: e.target.value })}
               required
             />
 
             <label htmlFor="state">State</label>
             <StateDropdown
-              value={state}
-              onChange={(e) => setState(e.target.value)}
+              value={employee.state}
+              onChange={(value) => setEmployee({ ...employee, state: value.target.value })}
             />
 
-            <label htmlFor="zip-code">Zip Code</label>
+            <label htmlFor="zipCode">Zip Code</label>
             <input
               type="number"
               id="zipCode"
-              value={zipCode}
-              onChange={(e) => setZipCode(e.target.value)}
+              value={employee.zipCode}
+              onChange={(e) => setEmployee({ ...employee, zipCode: e.target.value })}
               required
             />
           </fieldset>
@@ -162,8 +163,8 @@ export default function Home() {
           <select
             name="department"
             id="department"
-            value={departement}
-            onChange={(e) => setDepartement(e.target.value)}
+            value={employee.department}
+            onChange={(e) => setEmployee({ ...employee, department: e.target.value })}
             required
           >
             <option value="Sales">Sales</option>
@@ -172,12 +173,14 @@ export default function Home() {
             <option value="Human Resources">Human Resources</option>
             <option value="Legal">Legal</option>
           </select>
+
           <button type="submit" className="saveButton">
             Save
           </button>
         </form>
       </div>
-      {/* MODAL  */}
+
+      {/* MODAL */}
       <Modal
         show={showModal}
         onClose={closeModal}
@@ -186,3 +189,5 @@ export default function Home() {
     </div>
   );
 }
+
+

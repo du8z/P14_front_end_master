@@ -1,28 +1,19 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
-import {createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Home from './pages/CreateEmployee/CreateEmployee';
 import EmployeeList from './pages/EmployeeList/EmployeeList';
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <Home/>,
-  },
-  {
-    path: '/employee-list',
-    element: <EmployeeList/>,
-  }
-])
+import store from './Redux/store';
+import { Provider } from 'react-redux';
 
+const root = createRoot(document.getElementById('root'));
 
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-    <RouterProvider router={router} />
-
-)
-
+  <Provider store={store}>
+    <Home />
+  </Provider>
+);
 
 reportWebVitals();
+
