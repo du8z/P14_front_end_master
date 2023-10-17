@@ -7,7 +7,7 @@ import { format } from "date-fns";
 import Modal from "../../components/Modal/Modal";
 import { addEmployee } from "../../Redux/employeeSlice";
 import { useDispatch } from 'react-redux'
-
+import { Link } from "react-router-dom";
 export default function Home() {
 
   const dispatch = useDispatch()
@@ -83,7 +83,7 @@ export default function Home() {
         <h1>HRnet</h1>
       </div>
       <div className="container">
-        <a href="employee-list">View Current Employees</a>
+      <Link to="/employee-list">View Current Employees</Link> {/* Lien vers la liste des employés */}
         <h2>Create Employee</h2>
         <form onSubmit={handleSubmit} className="flexForm">
           <label htmlFor="firstName">First Name</label>
