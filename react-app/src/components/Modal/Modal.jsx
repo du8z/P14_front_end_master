@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import './Modal.css'
 export default function Modal({ show, onClose, message }) {
   const handleClose = () => {
