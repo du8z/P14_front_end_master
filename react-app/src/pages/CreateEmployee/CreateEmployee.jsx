@@ -83,7 +83,7 @@ export default function Home() {
         <h1>HRnet</h1>
       </div>
       <div className="container">
-      <Link to="/employee-list">View Current Employees</Link> {/* Lien vers la liste des employés */}
+      <Link to="/employee-list">View Current Employees</Link> 
         <h2>Create Employee</h2>
         <form onSubmit={handleSubmit} className="flexForm">
           <label htmlFor="firstName">First Name</label>
