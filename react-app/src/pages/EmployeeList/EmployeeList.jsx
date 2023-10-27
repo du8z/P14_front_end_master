@@ -9,6 +9,8 @@ export default function EmployeeList() {
   const [sortOrder, setSortOrder] = useState("asc"); // Ordre de tri initial
   const [employeesPerPage, setEmployeesPerPage] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchText, setSearchText] = useState("");
+
   const handleSort = (column) => {
     // Réinitialisez l'ordre de tri à ascendant pour une nouvelle colonne
     setSortColumn(column);
@@ -63,6 +65,10 @@ export default function EmployeeList() {
     setEmployeesPerPage(selectedValue);
     setCurrentPage(1)
   };
+  const handleSearch = (event) => {
+    const text = event.target.value;
+    setSearchText(text);
+  };
 
   // Fonction pour gérer le changement de page
   const handlePageChange = (page) => {
@@ -77,7 +83,12 @@ export default function EmployeeList() {
   console.log(endIndex);
   const visibleEmployees = sortedEmployees.slice(startIndex, endIndex);
   console.log(visibleEmployees);
-
+  const filteredEmployees = visibleEmployees.filter((employee) => {
+    // Filtrer les employés en fonction de la valeur de recherche
+    return Object.values(employee).some((value) =>
+      value.toLowerCase().includes(searchText.toLowerCase())
+    );
+  });
   return (
     <div>
       <div className="headerTable">
@@ -89,13 +100,19 @@ export default function EmployeeList() {
             value={employeesPerPage}
             onChange={handleEmployeesPerPageChange}
           >
-            <option value={5}>5</option>
-            <option value={10}>10</option>
-            <option value={25}>25</option>
+            <option value={1}>1</option>
+            <option value={2}>2</option>
+            <option value={3}>3</option>
             <option value={50}>50</option>
           </select>
           employees per page
         </label>
+        <input
+        type="text"
+          placeholder="Search employees..."
+          value={searchText}
+          onChange={handleSearch}
+        />
       </div>
       <div>
         <table className="tableEmployee">
@@ -176,7 +193,7 @@ export default function EmployeeList() {
             </tr>
           </thead>
           <tbody>
-            {visibleEmployees.map((employee, index) => (
+            {filteredEmployees.map((employee, index) => (
               <tr key={index} className="employeeRow">
                 <td>{employee.firstName}</td>
                 <td>{employee.lastName}</td>
