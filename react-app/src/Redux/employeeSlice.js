@@ -4,7 +4,6 @@ const storedData = localStorage.getItem("employees");
 const initialState = {
   employees: storedData ? JSON.parse(storedData) : []
 }
-console.log(JSON.parse(storedData));
 const employeeSlice = createSlice({
   name: 'employees',
   initialState,

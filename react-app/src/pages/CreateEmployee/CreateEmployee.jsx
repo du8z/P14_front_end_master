@@ -4,8 +4,7 @@ import StateDropdown from "../../components/StateDropdown/StateDropdown";
 import "react-datepicker/dist/react-datepicker.css";
 import DatePickers from "../../components/DatePicker/DatePicker";
 import { format } from "date-fns";
-import Modal from "../../components/Modal/Modal";
-// import {Modal} from 'my-modal-component-library'
+import Modal from 'my-modal-component-library'
 import { addEmployee } from "../../Redux/employeeSlice";
 import { useDispatch } from 'react-redux'
 import { Link } from "react-router-dom";

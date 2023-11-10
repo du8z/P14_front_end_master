@@ -52,3 +52,18 @@ tr:nth-child(even) {
     font-weight: bold;
     border-radius: 3px;
 }
+.topOfTable {
+    margin-bottom: -30px;
+    width: 90%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+}
+.positionChildren {
+    display: flex;
+    align-items: center;
+}
+.positionChildren p {
+    padding: 0 5px;
+}

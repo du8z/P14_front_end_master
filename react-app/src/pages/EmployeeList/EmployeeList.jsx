@@ -39,7 +39,9 @@ export default function EmployeeList() {
 
     return 0; // Les dates sont égales
   };
-
+  const compareZipCodes = (zipCodeA, zipCodeB) => {
+    return sortOrder === "asc" ? zipCodeA - zipCodeB : zipCodeB - zipCodeA;
+  };
   const getSortedEmployees = () => {
     let sortedEmployees = [...employees];
 
@@ -47,6 +49,11 @@ export default function EmployeeList() {
       // Triez les employés en fonction de la colonne de tri (ordre chronologique)
       sortedEmployees.sort((a, b) =>
         compareDates(a[sortColumn], b[sortColumn])
+      );
+    } else if (sortColumn === "zipCode") {
+      // Triez les employés en fonction de la colonne "Zip Code"
+      sortedEmployees.sort((a, b) =>
+        compareZipCodes(parseInt(a[sortColumn]), parseInt(b[sortColumn]))
       );
     } else if (sortColumn) {
       // Triez les employés en fonction de la colonne de tri (ordre alphabétique)
@@ -63,7 +70,7 @@ export default function EmployeeList() {
   const handleEmployeesPerPageChange = (event) => {
     const selectedValue = parseInt(event.target.value, 10);
     setEmployeesPerPage(selectedValue);
-    setCurrentPage(1)
+    setCurrentPage(1);
   };
   const handleSearch = (event) => {
     const text = event.target.value;
@@ -74,15 +81,13 @@ export default function EmployeeList() {
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
+
   const sortedEmployees = getSortedEmployees();
 
   // Calcul de l'index de début et de fin
   const startIndex = (currentPage - 1) * employeesPerPage;
   const endIndex = startIndex + employeesPerPage;
-  console.log(startIndex);
-  console.log(endIndex);
   const visibleEmployees = sortedEmployees.slice(startIndex, endIndex);
-  console.log(visibleEmployees);
   const filteredEmployees = visibleEmployees.filter((employee) => {
     // Filtrer les employés en fonction de la valeur de recherche
     return Object.values(employee).some((value) =>
@@ -94,25 +99,27 @@ export default function EmployeeList() {
       <div className="headerTable">
         <h2>Employee List</h2>
         <Link to="/">Create Employee</Link>
-        <label>
-          Show
+        <div className="topOfTable">
+        <label className="positionChildren">
+          <p>Show</p>
           <select
             value={employeesPerPage}
             onChange={handleEmployeesPerPageChange}
           >
-            <option value={1}>1</option>
-            <option value={2}>2</option>
-            <option value={3}>3</option>
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={25}>25</option>
             <option value={50}>50</option>
           </select>
-          employees per page
+          <p>employees per page</p>
         </label>
         <input
-        type="text"
+          type="text"
           placeholder="Search employees..."
           value={searchText}
           onChange={handleSearch}
         />
+        </div>
       </div>
       <div>
         <table className="tableEmployee">
@@ -208,23 +215,24 @@ export default function EmployeeList() {
             ))}
           </tbody>
         </table>
-
       </div>
       <div className="pagination">
-      <button
-        onClick={() => handlePageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-      >
-        Prev
-      </button>
-      <div className="pageSquare">{currentPage}</div>
-      <button
-        onClick={() => handlePageChange(currentPage + 1)}
-        disabled={currentPage === Math.ceil(employees.length / employeesPerPage)}
-      >
-        Next
-      </button>
-    </div>
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          Prev
+        </button>
+        <div className="pageSquare">{currentPage}</div>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={
+            currentPage === Math.ceil(employees.length / employeesPerPage)
+          }
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }
