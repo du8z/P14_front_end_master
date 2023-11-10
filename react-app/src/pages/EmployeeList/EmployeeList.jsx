@@ -5,22 +5,30 @@ import { Link } from "react-router-dom";
 
 export default function EmployeeList() {
   const employees = useSelector((state) => state.employees.employees);
-  const [sortColumn, setSortColumn] = useState(null); // Colonne de tri
-  const [sortOrder, setSortOrder] = useState("asc"); // Ordre de tri initial
-  const [employeesPerPage, setEmployeesPerPage] = useState(5);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchText, setSearchText] = useState("");
+
+  // Utiliser un seul useState pour gérer l'ensemble des paramètres
+  const [filterParams, setFilterParams] = useState({
+    sortColumn: null,
+    sortOrder: "asc",
+    employeesPerPage: 5,
+    currentPage: 1,
+    searchText: "",
+  });
 
   const handleSort = (column) => {
-    // Réinitialisez l'ordre de tri à ascendant pour une nouvelle colonne
-    setSortColumn(column);
-    setSortOrder("asc");
-    // Inversez l'ordre de tri si la colonne est déjà sélectionnée
-
-    if (column === sortColumn) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    }
+    // Utiliser le paramètre précédent pour mettre à jour l'état
+    setFilterParams((prevParams) => ({
+      ...prevParams,
+      sortColumn: column,
+      sortOrder:
+        column === prevParams.sortColumn
+          ? prevParams.sortOrder === "asc"
+            ? "desc"
+            : "asc"
+          : "asc",
+    }));
   };
+
   const parseDate = (dateString) => {
     const [day, month, year] = dateString.split("/").map(Number);
     return new Date(year, month - 1, day);
@@ -30,38 +38,40 @@ export default function EmployeeList() {
     const parsedDateA = parseDate(dateA);
     const parsedDateB = parseDate(dateB);
 
-    if (parsedDateA < parsedDateB) {
-      return sortOrder === "asc" ? -1 : 1;
-    }
-    if (parsedDateA > parsedDateB) {
-      return sortOrder === "asc" ? 1 : -1;
-    }
+    return filterParams.sortOrder === "asc"
+      ? parsedDateA - parsedDateB
+      : parsedDateB - parsedDateA;
+  };
 
-    return 0; // Les dates sont égales
-  };
   const compareZipCodes = (zipCodeA, zipCodeB) => {
-    return sortOrder === "asc" ? zipCodeA - zipCodeB : zipCodeB - zipCodeA;
+    return filterParams.sortOrder === "asc"
+      ? zipCodeA - zipCodeB
+      : zipCodeB - zipCodeA;
   };
+
   const getSortedEmployees = () => {
     let sortedEmployees = [...employees];
 
-    if (sortColumn === "dateOfBirth" || sortColumn === "startDate") {
-      // Triez les employés en fonction de la colonne de tri (ordre chronologique)
+    if (
+      filterParams.sortColumn === "dateOfBirth" ||
+      filterParams.sortColumn === "startDate"
+    ) {
       sortedEmployees.sort((a, b) =>
-        compareDates(a[sortColumn], b[sortColumn])
+        compareDates(a[filterParams.sortColumn], b[filterParams.sortColumn])
       );
-    } else if (sortColumn === "zipCode") {
-      // Triez les employés en fonction de la colonne "Zip Code"
+    } else if (filterParams.sortColumn === "zipCode") {
       sortedEmployees.sort((a, b) =>
-        compareZipCodes(parseInt(a[sortColumn]), parseInt(b[sortColumn]))
+        compareZipCodes(
+          parseInt(a[filterParams.sortColumn]),
+          parseInt(b[filterParams.sortColumn])
+        )
       );
-    } else if (sortColumn) {
-      // Triez les employés en fonction de la colonne de tri (ordre alphabétique)
-      sortedEmployees.sort((a, b) => {
-        return sortOrder === "asc"
-          ? a[sortColumn].localeCompare(b[sortColumn])
-          : b[sortColumn].localeCompare(a[sortColumn]);
-      });
+    } else if (filterParams.sortColumn) {
+      sortedEmployees.sort((a, b) =>
+        filterParams.sortOrder === "asc"
+          ? a[filterParams.sortColumn].localeCompare(b[filterParams.sortColumn])
+          : b[filterParams.sortColumn].localeCompare(a[filterParams.sortColumn])
+      );
     }
 
     return sortedEmployees;
@@ -69,56 +79,60 @@ export default function EmployeeList() {
 
   const handleEmployeesPerPageChange = (event) => {
     const selectedValue = parseInt(event.target.value, 10);
-    setEmployeesPerPage(selectedValue);
-    setCurrentPage(1);
-  };
-  const handleSearch = (event) => {
-    const text = event.target.value;
-    setSearchText(text);
+    setFilterParams((prevParams) => ({
+      ...prevParams,
+      employeesPerPage: selectedValue,
+      currentPage: 1,
+    }));
   };
 
-  // Fonction pour gérer le changement de page
+  const handleSearch = (event) => {
+    const text = event.target.value;
+    setFilterParams((prevParams) => ({ ...prevParams, searchText: text }));
+  };
+
   const handlePageChange = (page) => {
-    setCurrentPage(page);
+    setFilterParams((prevParams) => ({ ...prevParams, currentPage: page }));
   };
 
   const sortedEmployees = getSortedEmployees();
 
-  // Calcul de l'index de début et de fin
-  const startIndex = (currentPage - 1) * employeesPerPage;
-  const endIndex = startIndex + employeesPerPage;
+  const startIndex =
+    (filterParams.currentPage - 1) * filterParams.employeesPerPage;
+  const endIndex = startIndex + filterParams.employeesPerPage;
   const visibleEmployees = sortedEmployees.slice(startIndex, endIndex);
-  const filteredEmployees = visibleEmployees.filter((employee) => {
-    // Filtrer les employés en fonction de la valeur de recherche
-    return Object.values(employee).some((value) =>
-      value.toLowerCase().includes(searchText.toLowerCase())
-    );
-  });
+
+  const filteredEmployees = visibleEmployees.filter((employee) =>
+    Object.values(employee).some((value) =>
+      value.toLowerCase().includes(filterParams.searchText.toLowerCase())
+    )
+  );
+
   return (
     <div>
       <div className="headerTable">
         <h2>Employee List</h2>
         <Link to="/">Create Employee</Link>
         <div className="topOfTable">
-        <label className="positionChildren">
-          <p>Show</p>
-          <select
-            value={employeesPerPage}
-            onChange={handleEmployeesPerPageChange}
-          >
-            <option value={5}>5</option>
-            <option value={10}>10</option>
-            <option value={25}>25</option>
-            <option value={50}>50</option>
-          </select>
-          <p>employees per page</p>
-        </label>
-        <input
-          type="text"
-          placeholder="Search employees..."
-          value={searchText}
-          onChange={handleSearch}
-        />
+          <label className="positionChildren">
+            <p>Show</p>
+            <select
+              value={filterParams.employeesPerPage}
+              onChange={handleEmployeesPerPageChange}
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+            </select>
+            <p>employees per page</p>
+          </label>
+          <input
+            type="text"
+            placeholder="Search employees..."
+            value={filterParams.searchText}
+            onChange={handleSearch}
+          />
         </div>
       </div>
       <div>
@@ -127,72 +141,72 @@ export default function EmployeeList() {
             <tr>
               <th className="pointer" onClick={() => handleSort("firstName")}>
                 First Name{" "}
-                {sortColumn === "firstName"
-                  ? sortOrder === "asc"
+                {filterParams.sortColumn === "firstName"
+                  ? filterParams.sortOrder === "asc"
                     ? "▲"
                     : "▼"
                   : null}
               </th>
               <th className="pointer" onClick={() => handleSort("lastName")}>
                 Last Name{" "}
-                {sortColumn === "lastName"
-                  ? sortOrder === "asc"
+                {filterParams.sortColumn === "lastName"
+                  ? filterParams.sortOrder === "asc"
                     ? "▲"
                     : "▼"
                   : null}
               </th>
               <th className="pointer" onClick={() => handleSort("dateOfBirth")}>
                 Date of Birth{" "}
-                {sortColumn === "dateOfBirth"
-                  ? sortOrder === "asc"
+                {filterParams.sortColumn === "dateOfBirth"
+                  ? filterParams.sortOrder === "asc"
                     ? "▲"
                     : "▼"
                   : null}
               </th>
               <th className="pointer" onClick={() => handleSort("startDate")}>
                 Start Date{" "}
-                {sortColumn === "startDate"
-                  ? sortOrder === "asc"
+                {filterParams.sortColumn === "startDate"
+                  ? filterParams.sortOrder === "asc"
                     ? "▲"
                     : "▼"
                   : null}
               </th>
               <th className="pointer" onClick={() => handleSort("street")}>
                 Street{" "}
-                {sortColumn === "street"
-                  ? sortOrder === "asc"
+                {filterParams.sortColumn === "street"
+                  ? filterParams.sortOrder === "asc"
                     ? "▲"
                     : "▼"
                   : null}
               </th>
               <th className="pointer" onClick={() => handleSort("city")}>
                 City{" "}
-                {sortColumn === "city"
-                  ? sortOrder === "asc"
+                {filterParams.sortColumn === "city"
+                  ? filterParams.sortOrder === "asc"
                     ? "▲"
                     : "▼"
                   : null}
               </th>
               <th className="pointer" onClick={() => handleSort("state")}>
                 State{" "}
-                {sortColumn === "state"
-                  ? sortOrder === "asc"
+                {filterParams.sortColumn === "state"
+                  ? filterParams.sortOrder === "asc"
                     ? "▲"
                     : "▼"
                   : null}
               </th>
               <th className="pointer" onClick={() => handleSort("zipCode")}>
                 Zip Code{" "}
-                {sortColumn === "zipCode"
-                  ? sortOrder === "asc"
+                {filterParams.sortColumn === "zipCode"
+                  ? filterParams.sortOrder === "asc"
                     ? "▲"
                     : "▼"
                   : null}
               </th>
               <th className="pointer" onClick={() => handleSort("department")}>
                 Department{" "}
-                {sortColumn === "department"
-                  ? sortOrder === "asc"
+                {filterParams.sortColumn === "department"
+                  ? filterParams.sortOrder === "asc"
                     ? "▲"
                     : "▼"
                   : null}
@@ -218,16 +232,17 @@ export default function EmployeeList() {
       </div>
       <div className="pagination">
         <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
+          onClick={() => handlePageChange(filterParams.currentPage - 1)}
+          disabled={filterParams.currentPage === 1}
         >
           Prev
         </button>
-        <div className="pageSquare">{currentPage}</div>
+        <div className="pageSquare">{filterParams.currentPage}</div>
         <button
-          onClick={() => handlePageChange(currentPage + 1)}
+          onClick={() => handlePageChange(filterParams.currentPage + 1)}
           disabled={
-            currentPage === Math.ceil(employees.length / employeesPerPage)
+            filterParams.currentPage ===
+            Math.ceil(employees.length / filterParams.employeesPerPage)
           }
         >
           Next
