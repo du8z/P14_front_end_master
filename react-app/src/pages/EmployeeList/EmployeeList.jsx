@@ -6,7 +6,6 @@ import { Link } from "react-router-dom";
 export default function EmployeeList() {
   const employees = useSelector((state) => state.employees.employees);
 
-  // Utiliser un seul useState pour gérer l'ensemble des paramètres
   const [filterParams, setFilterParams] = useState({
     sortColumn: null,
     sortOrder: "asc",
@@ -16,7 +15,6 @@ export default function EmployeeList() {
   });
 
   const handleSort = (column) => {
-    // Utiliser le paramètre précédent pour mettre à jour l'état
     setFilterParams((prevParams) => ({
       ...prevParams,
       sortColumn: column,
