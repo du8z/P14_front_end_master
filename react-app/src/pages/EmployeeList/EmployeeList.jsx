@@ -3,9 +3,12 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
+// Composant principal pour la liste des employés
 export default function EmployeeList() {
+  // Sélectionne les employés depuis le store Redux
   const employees = useSelector((state) => state.employees.employees);
 
+  // État local pour les paramètres de filtrage et de pagination
   const [filterParams, setFilterParams] = useState({
     sortColumn: null,
     sortOrder: "asc",
@@ -13,7 +16,7 @@ export default function EmployeeList() {
     currentPage: 1,
     searchText: "",
   });
-
+  // Fonction pour gérer le tri des colonnes
   const handleSort = (column) => {
     setFilterParams((prevParams) => ({
       ...prevParams,
@@ -27,11 +30,13 @@ export default function EmployeeList() {
     }));
   };
 
+  // Fonction pour parser une date au format "dd/MM/yyyy"
   const parseDate = (dateString) => {
     const [day, month, year] = dateString.split("/").map(Number);
     return new Date(year, month - 1, day);
   };
 
+  // Fonction pour comparer deux dates pour le tri
   const compareDates = (dateA, dateB) => {
     const parsedDateA = parseDate(dateA);
     const parsedDateB = parseDate(dateB);
@@ -74,7 +79,7 @@ export default function EmployeeList() {
 
     return sortedEmployees;
   };
-
+  // Fonction pour gérer le changement du nombre d'employés par page
   const handleEmployeesPerPageChange = (event) => {
     const selectedValue = parseInt(event.target.value, 10);
     setFilterParams((prevParams) => ({
@@ -83,29 +88,35 @@ export default function EmployeeList() {
       currentPage: 1,
     }));
   };
-
+  // Fonction pour gérer la recherche d'employés
   const handleSearch = (event) => {
     const text = event.target.value;
     setFilterParams((prevParams) => ({ ...prevParams, searchText: text }));
   };
-
+  // Fonction pour gérer le changement de page
   const handlePageChange = (page) => {
     setFilterParams((prevParams) => ({ ...prevParams, currentPage: page }));
   };
 
+  // Liste triée des employés en fonction des paramètres de filtrage
   const sortedEmployees = getSortedEmployees();
 
+  // Indices de début et de fin pour l'affichage des employés actuels
   const startIndex =
     (filterParams.currentPage - 1) * filterParams.employeesPerPage;
   const endIndex = startIndex + filterParams.employeesPerPage;
+
+  // Employés actuellement visibles sur la page
   const visibleEmployees = sortedEmployees.slice(startIndex, endIndex);
 
+  // Employés filtrés en fonction du texte de recherche
   const filteredEmployees = visibleEmployees.filter((employee) =>
     Object.values(employee).some((value) =>
       value.toLowerCase().includes(filterParams.searchText.toLowerCase())
     )
   );
 
+  // JSX de la liste des employés
   return (
     <div>
       <div className="headerTable">

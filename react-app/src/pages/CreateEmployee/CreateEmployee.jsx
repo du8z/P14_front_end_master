@@ -4,38 +4,40 @@ import StateDropdown from "../../components/StateDropdown/StateDropdown";
 import "react-datepicker/dist/react-datepicker.css";
 import DatePickers from "../../components/DatePicker/DatePicker";
 import { format } from "date-fns";
-import Modal from 'my-modal-component-library'
+import Modal from "my-modal-component-library";
 import { addEmployee } from "../../Redux/employeeSlice";
-import { useDispatch } from 'react-redux'
+import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 
+// Composant principal pour la page de création d'employé
 export default function Home() {
-
-  const dispatch = useDispatch()
+  // Hook Redux pour dispatcher des actions
+  const dispatch = useDispatch();
 
   // État de la modal (ouverte/fermée) et fonctions pour la gérer.
-  const [showModal, setShowModal] = useState(false)
+  const [showModal, setShowModal] = useState(false);
 
   const openModal = () => {
-    setShowModal(true)
-  }
+    setShowModal(true);
+  };
   const closeModal = () => {
-    setShowModal(false)
-  }
+    setShowModal(false);
+  };
+
+  // État local pour les données de l'employé
   const [employee, setEmployee] = useState({
-    firstName: '',
-    lastName: '',
+    firstName: "",
+    lastName: "",
     dateOfBirth: new Date(),
     startDate: new Date(),
-    street: '',
-    city: '',
-    state: '',
+    street: "",
+    city: "",
+    state: "",
     zipCode: 0,
-    department: '',
+    department: "",
+  });
 
-  })
-
-  // Actions lors de l'envoi du formulaire
+  // Fonction appelée lors de la soumission du formulaire
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -56,26 +58,26 @@ export default function Home() {
       department: employee.department,
     };
     console.log(newEmployee);
-    dispatch(addEmployee(newEmployee))
 
+    // Dispatch l'action pour ajouter l'employé via Redux
+    dispatch(addEmployee(newEmployee));
 
     // Reset les inputs
     setEmployee({
-      firstName: '',
-      lastName: '',
+      firstName: "",
+      lastName: "",
       dateOfBirth: new Date(),
       startDate: new Date(),
-      street: '',
-      city: '',
-      state: '',
-      zipCode: '',
-      department: '', 
+      street: "",
+      city: "",
+      state: "",
+      zipCode: "",
+      department: "",
     });
 
-
-    openModal()
+    // Ouvre la modal de confirmation
+    openModal();
   };
-
 
   // JSX du formualaire, des différents input
   return (
@@ -84,7 +86,7 @@ export default function Home() {
         <h1>HRnet</h1>
       </div>
       <div className="container">
-      <Link to="/employee-list">View Current Employees</Link> 
+        <Link to="/employee-list">View Current Employees</Link>
         <h2>Create Employee</h2>
         <form onSubmit={handleSubmit} className="flexForm">
           <label htmlFor="firstName">First Name</label>
@@ -92,7 +94,9 @@ export default function Home() {
             type="text"
             id="firstName"
             value={employee.firstName}
-            onChange={(e) => setEmployee({ ...employee, firstName: e.target.value })}
+            onChange={(e) =>
+              setEmployee({ ...employee, firstName: e.target.value })
+            }
             required
           />
 
@@ -101,26 +105,30 @@ export default function Home() {
             type="text"
             id="lastName"
             value={employee.lastName}
-            onChange={(e) => setEmployee({ ...employee, lastName: e.target.value })}
+            onChange={(e) =>
+              setEmployee({ ...employee, lastName: e.target.value })
+            }
             required
           />
 
           {/* Sélection des dates */}
-          <div >
-          <DatePickers
-            label='Date of Birth'
-            id= 'dateOfBirth'
-            selected={employee.dateOfBirth}
-            onChange={(date) => setEmployee({ ...employee, dateOfBirth: date })}
-          />
+          <div>
+            <DatePickers
+              label="Date of Birth"
+              id="dateOfBirth"
+              selected={employee.dateOfBirth}
+              onChange={(date) =>
+                setEmployee({ ...employee, dateOfBirth: date })
+              }
+            />
           </div>
-          <div >
-          <DatePickers
-            label='Start Date'
-            id= 'startDate'
-            selected={employee.startDate}
-            onChange={(date) => setEmployee({ ...employee, startDate: date })}
-          />
+          <div>
+            <DatePickers
+              label="Start Date"
+              id="startDate"
+              selected={employee.startDate}
+              onChange={(date) => setEmployee({ ...employee, startDate: date })}
+            />
           </div>
 
           <fieldset className="address">
@@ -131,7 +139,9 @@ export default function Home() {
               type="text"
               id="street"
               value={employee.street}
-              onChange={(e) => setEmployee({ ...employee, street: e.target.value })}
+              onChange={(e) =>
+                setEmployee({ ...employee, street: e.target.value })
+              }
               required
             />
 
@@ -140,14 +150,18 @@ export default function Home() {
               type="text"
               id="city"
               value={employee.city}
-              onChange={(e) => setEmployee({ ...employee, city: e.target.value })}
+              onChange={(e) =>
+                setEmployee({ ...employee, city: e.target.value })
+              }
               required
             />
 
             <label htmlFor="state">State</label>
             <StateDropdown
               value={employee.state}
-              onChange={(value) => setEmployee({ ...employee, state: value.target.value })}
+              onChange={(value) =>
+                setEmployee({ ...employee, state: value.target.value })
+              }
             />
 
             <label htmlFor="zipCode">Zip Code</label>
@@ -155,7 +169,9 @@ export default function Home() {
               type="number"
               id="zipCode"
               value={employee.zipCode}
-              onChange={(e) => setEmployee({ ...employee, zipCode: e.target.value })}
+              onChange={(e) =>
+                setEmployee({ ...employee, zipCode: e.target.value })
+              }
               required
             />
           </fieldset>
@@ -165,7 +181,9 @@ export default function Home() {
             name="department"
             id="department"
             value={employee.department}
-            onChange={(e) => setEmployee({ ...employee, department: e.target.value })}
+            onChange={(e) =>
+              setEmployee({ ...employee, department: e.target.value })
+            }
             required
           >
             <option value="Sales">Sales</option>
@@ -190,5 +208,3 @@ export default function Home() {
     </div>
   );
 }
-
-
